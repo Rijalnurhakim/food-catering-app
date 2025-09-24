@@ -10,8 +10,12 @@ export interface Product {
 }
 
 export interface OrderItem {
+  id: number;
   product_id: number;
+  order_id: number;
   quantity: number;
+  price_at_time: number;
+  product_name?: string; // TAMBAHKAN INI
 }
 
 export interface Order {

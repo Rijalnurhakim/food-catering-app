@@ -10,6 +10,7 @@ const ProductListPage: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Tambah state search
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
@@ -22,6 +23,12 @@ const ProductListPage: React.FC = () => {
   useEffect(() => {
     let result = products;
 
+    // Apply search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter((product) => product.name.toLowerCase().includes(term) || product.description.toLowerCase().includes(term));
+    }
+
     // Apply category filter
     if (selectedCategory) {
       result = result.filter((product) => product.category.toLowerCase() === selectedCategory.toLowerCase());
@@ -32,10 +39,12 @@ const ProductListPage: React.FC = () => {
       result = [...result].sort((a, b) => a.price - b.price);
     } else if (sortOption === "price_desc") {
       result = [...result].sort((a, b) => b.price - a.price);
+    } else {
+      result = [...result].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
 
     setFilteredProducts(result);
-  }, [products, selectedCategory, sortOption]);
+  }, [products, selectedCategory, sortOption, searchTerm]); // Tambah searchTerm ke dependency
 
   const fetchProducts = async () => {
     try {
@@ -78,7 +87,7 @@ const ProductListPage: React.FC = () => {
       <p className="text-gray-600 mb-6">Delicious catering options for every occasion</p>
 
       {/* Filters */}
-      <ProductFilter categories={categories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} sortOption={sortOption} onSortChange={setSortOption} />
+      <ProductFilter categories={categories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} sortOption={sortOption} onSortChange={setSortOption} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -90,7 +99,10 @@ const ProductListPage: React.FC = () => {
       {/* Empty State */}
       {filteredProducts.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-gray-500 text-lg">No products found{selectedCategory && ` in category "${selectedCategory}"`}</div>
+          <div className="text-gray-500 text-lg">
+            No products found{selectedCategory && ` in category "${selectedCategory}"`}
+            {searchTerm && ` matching "${searchTerm}"`}
+          </div>
         </div>
       )}
     </div>
