@@ -7,9 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="BiteSwift API", version="1.0.0")
 
+origins = [
+    "http://localhost:5173", # Untuk development lokal
+    "https://food-catering-nine.vercel.app/" # URL frontend Anda di Vercel
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
